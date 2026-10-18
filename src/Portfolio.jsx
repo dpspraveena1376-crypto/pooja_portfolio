@@ -12,8 +12,9 @@ import Footer from './sections/Footer.jsx';
 // Width / height of the hero portrait (public/assets/portrait-home.webp). The buttons ring around it,
 // so update this if the portrait is swapped for one with a different shape.
 const FACE_RATIO = 920 / 900;
-// Loader: window (ms) within which the frame bricks set off, each at a random moment.
-const INTRO_SPREAD = 1000;
+// Loader: window (ms) within which the frame bricks set off, each at a random moment; how long each
+// brick's flight takes; and its easing (a soft ease-out that glides in with only a hint of settle).
+const INTRO_SPREAD = 1000, INTRO_MOVE = 1000, INTRO_EASE = 'cubic-bezier(.22,1.08,.36,1)';
 
 // Page logic ported from the Claude Design component (Portfolio v4). renderVals() derives every
 // responsive measurement and interaction state; the section components are pure views of it.
@@ -50,9 +51,9 @@ export default class Portfolio extends Component {
   startIntro() {
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) { this.setState({ intro: 'done' }); return; }
-    // Bricks set off at random moments within INTRO_SPREAD ms, each taking ~0.62s to click into place.
+    // Bricks set off at random moments within INTRO_SPREAD ms, each gliding for INTRO_MOVE ms.
     this.introT1 = setTimeout(() => this.setState({ intro: 'build' }, () => {
-      this.introT2 = setTimeout(() => this.setState({ intro: 'done' }), INTRO_SPREAD + 750);
+      this.introT2 = setTimeout(() => this.setState({ intro: 'done' }), INTRO_SPREAD + INTRO_MOVE + 80);
     }), 450);
     this.introT3 = setTimeout(() => { if (this.state.intro !== 'done') this.setState({ intro: 'done' }); }, 4500);
   }
@@ -152,7 +153,7 @@ export default class Portfolio extends Component {
     const rnd = (id, k) => { const v = Math.sin(id * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
     const introStyle = (id, q, sl) => {
       if (intro === 'done') return null;
-      if (intro === 'build') return { tf: 'none', trans: `transform 0.62s cubic-bezier(.34,1.4,.64,1) ${Math.round(rnd(id, 4) * INTRO_SPREAD)}ms` };
+      if (intro === 'build') return { tf: 'none', trans: `transform ${INTRO_MOVE}ms ${INTRO_EASE} ${Math.round(rnd(id, 4) * INTRO_SPREAD)}ms` };
       const sx = W * (0.18 + 0.64 * rnd(id, 1)), sy = H * (0.22 + 0.56 * rnd(id, 2));
       return { tf: `translate(${Math.round(sx - q.x - q.w / 2)}px, ${Math.round(sy - q.y - q.h / 2)}px) rotate(${Math.round(rnd(id, 3) * 90 - 45)}deg) scale(0.86)`, trans: 'none' };
     };
@@ -179,6 +180,8 @@ export default class Portfolio extends Component {
       brHint: { left: (t + 14) + 'px', top: (t + 12) + 'px', op: intro !== 'done' || changed || (dr && dr.moved) ? 0 : 1 },
       // Hero content and header stay hidden until the loader has built the frame.
       introOp: intro === 'done' ? 1 : 0,
+      // While the loader runs, let the browser move the bricks on the GPU for smooth frames.
+      introWill: intro === 'done' ? 'auto' : 'transform',
       brChanged: changed, brResetL: (t + 14) + 'px', brResetB: (t + 14) + 'px', brLive: this.state.brLive || '',
       brReset: () => { this.setState({ brN: N, brOrder: st.defOrder, brColor: st.defColor, brPick: null, brLive: 'Frame reset.' }); } };
   }

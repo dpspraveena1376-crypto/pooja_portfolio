@@ -66,6 +66,7 @@ export default function Home({ v }) {
                 pointerEvents: 'auto',
                 touchAction: k.touch,
                 transform: k.tf,
+                willChange: v.introWill,
                 filter: k.filter,
                 outline: k.outline,
                 outlineOffset: '2px',
