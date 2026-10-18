@@ -4,6 +4,13 @@
   --paper-noise: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%272%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20values%3D%270%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.22%200%200%200%200%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
 }
 html { scroll-behavior: smooth; }
+/* A small red 1x1 LEGO brick, seen from above, is the cursor everywhere on the site, including over
+   links, buttons and draggable bricks (!important beats their inline cursor styles). The click point
+   is the stud in the middle; the 2x image keeps it sharp on high-density screens. */
+html, html * {
+  cursor: url('/cursor-brick.png') 10 10, auto !important;
+  cursor: -webkit-image-set(url('/cursor-brick.png') 1x, url('/cursor-brick@2x.png') 2x) 10 10, auto !important;
+}
 body { margin: 0; background: #FFF8EE; color: #24212E; font-family: 'Nunito', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 a { color: #2F5BFF; }
 a:hover { color: #1C3FCC; }

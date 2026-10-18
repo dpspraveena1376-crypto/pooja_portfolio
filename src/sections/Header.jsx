@@ -22,7 +22,8 @@ export default function Header({ v }) {
         background: v.headerBg,
         borderBottom: `1.5px solid ${v.headerLine ?? ''}`,
         backdropFilter: v.headerBlur,
-        transition: 'background 0.25s ease, border-color 0.25s ease',
+        opacity: v.introOp,
+        transition: 'background 0.25s ease, border-color 0.25s ease, opacity 0.55s ease',
       }}
     >
       <span />

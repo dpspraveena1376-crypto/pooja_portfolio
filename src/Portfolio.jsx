@@ -12,11 +12,13 @@ import Footer from './sections/Footer.jsx';
 // Width / height of the hero portrait (public/assets/portrait-home.webp). The buttons ring around it,
 // so update this if the portrait is swapped for one with a different shape.
 const FACE_RATIO = 920 / 900;
+// Loader: window (ms) within which the frame bricks set off, each at a random moment.
+const INTRO_SPREAD = 1000;
 
 // Page logic ported from the Claude Design component (Portfolio v4). renderVals() derives every
 // responsive measurement and interaction state; the section components are pure views of it.
 export default class Portfolio extends Component {
-  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1280, h: typeof window !== 'undefined' ? window.innerHeight : 800, scrolled: false, dock: false, active: 'home', menuOpen: false, filter: 'All', stop: 0, faceHover: false };
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1280, h: typeof window !== 'undefined' ? window.innerHeight : 800, scrolled: false, dock: false, active: 'home', menuOpen: false, filter: 'All', stop: 0, faceHover: false, intro: 'pending' };
   headerRef = createRef(); frameRef = createRef(); exRoadRef = createRef(); exPathRef = createRef(); exFaceRef = createRef(); exRailRef = createRef(); exRailFaceRef = createRef(); menuRef = createRef(); menuWrapRef = createRef();
 
   componentDidMount() {
@@ -28,6 +30,7 @@ export default class Portfolio extends Component {
     window.addEventListener('scroll', this.onScroll, { passive: true });
     document.addEventListener('keydown', this.onKey);
     document.addEventListener('mousedown', this.onDown);
+    this.startIntro();
     // Re-measure as fonts, images and the page scrollbar settle.
     [60, 400, 1200].forEach(t => setTimeout(() => this.update(), t));
     window.addEventListener('load', this.onScroll);
@@ -41,7 +44,20 @@ export default class Portfolio extends Component {
     // The hero just rescaled, so the frame changed height: re-measure so the bricks follow it.
     if (prev.heroK !== this.state.heroK) requestAnimationFrame(() => this.update());
   }
+  // Loader: the real frame bricks start scattered over the page, then fly into their slots one after
+  // another before the hero fades in. Plays once per full page load; skipped for reduced motion. The
+  // safety timer reveals the page even if images are slow or fail.
+  startIntro() {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { this.setState({ intro: 'done' }); return; }
+    // Bricks set off at random moments within INTRO_SPREAD ms, each taking ~0.62s to click into place.
+    this.introT1 = setTimeout(() => this.setState({ intro: 'build' }, () => {
+      this.introT2 = setTimeout(() => this.setState({ intro: 'done' }), INTRO_SPREAD + 750);
+    }), 450);
+    this.introT3 = setTimeout(() => { if (this.state.intro !== 'done') this.setState({ intro: 'done' }); }, 4500);
+  }
   componentWillUnmount() {
+    clearTimeout(this.introT1); clearTimeout(this.introT2); clearTimeout(this.introT3);
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('load', this.onScroll);
@@ -130,15 +146,26 @@ export default class Portfolio extends Component {
     if (dr && dr.moved) { target = dr.target; order = this.brMove(st.order, dr.fromSlot, target, S); }
     const slotOf = id => order.indexOf(id), focusSlot = this.state.brFocus == null ? 0 : Math.min(N - 1, this.state.brFocus);
     const pal = { red: 'Red', blue: 'Blue', yellow: 'Yellow', green: 'Green', pink: 'Pink', orange: 'Orange', lav: 'Purple', white: 'White', mint: 'Teal', cream: 'Cream' };
+    // Loader geometry: a scattered start point inside the frame for each brick, and a random start
+    // time so the frame fills in all over at once rather than in order.
+    const intro = this.state.intro;
+    const rnd = (id, k) => { const v = Math.sin(id * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
+    const introStyle = (id, q, sl) => {
+      if (intro === 'done') return null;
+      if (intro === 'build') return { tf: 'none', trans: `transform 0.62s cubic-bezier(.34,1.4,.64,1) ${Math.round(rnd(id, 4) * INTRO_SPREAD)}ms` };
+      const sx = W * (0.18 + 0.64 * rnd(id, 1)), sy = H * (0.22 + 0.56 * rnd(id, 2));
+      return { tf: `translate(${Math.round(sx - q.x - q.w / 2)}px, ${Math.round(sy - q.y - q.h / 2)}px) rotate(${Math.round(rnd(id, 3) * 90 - 45)}deg) scale(0.86)`, trans: 'none' };
+    };
     const brBricks = Array.from({ length: N }, (_, id) => {
       const sl = slotOf(id), q = S[sl], dragging = dr && dr.moved && dr.id === id, picked = pick && pick.id === id;
       const g = dragging ? S[dr.fromSlot] : q, x = dragging ? dr.px - dr.ox : q.x, y = dragging ? dr.py - dr.oy : q.y;
+      const io = introStyle(id, q, sl);
       return { id: String(id), src: 'assets/bricks/' + (dragging ? S[dr.fromSlot].sh : q.sh) + '-' + st.color[id] + '.png',
         left: x + 'px', top: y + 'px', w: g.w + 'px', h: g.h + 'px', z: dragging ? 30 : picked ? 25 : 1,
-        tf: dragging ? 'scale(1.08) rotate(-3deg)' : picked ? 'translateY(-4px) scale(1.04)' : 'none', hoverTf: dragging ? 'scale(1.08) rotate(-3deg)' : 'translateY(-3px) rotate(-2deg)',
+        tf: io ? io.tf : dragging ? 'scale(1.08) rotate(-3deg)' : picked ? 'translateY(-4px) scale(1.04)' : 'none', hoverTf: dragging ? 'scale(1.08) rotate(-3deg)' : 'translateY(-3px) rotate(-2deg)',
         filter: dragging ? 'drop-shadow(0 16px 18px rgba(36,33,46,0.32))' : picked ? 'drop-shadow(0 10px 12px rgba(36,33,46,0.28))' : 'drop-shadow(0 3px 4px rgba(36,33,46,0.16))',
         outline: picked ? '2.5px dashed #24212E' : 'none',
-        trans: dragging ? 'transform 0.15s ease, filter 0.15s ease' : 'left 0.45s cubic-bezier(.34,1.45,.64,1), top 0.45s cubic-bezier(.34,1.45,.64,1), width 0.45s ease, height 0.45s ease, transform 0.25s cubic-bezier(.34,1.56,.64,1), filter 0.2s ease',
+        trans: io ? io.trans : dragging ? 'transform 0.15s ease, filter 0.15s ease' : 'left 0.45s cubic-bezier(.34,1.45,.64,1), top 0.45s cubic-bezier(.34,1.45,.64,1), width 0.45s ease, height 0.45s ease, transform 0.25s cubic-bezier(.34,1.56,.64,1), filter 0.2s ease',
         cursor: dragging ? 'grabbing' : 'grab', touch: q.sh === 'h' ? 'pan-y' : 'none', tab: sl === focusSlot ? '0' : '-1', pressed: picked ? 'true' : 'false',
         aria: pal[st.color[id]] + ' LEGO brick ' + (sl + 1) + ' of ' + N + '. Enter changes colour, Space picks it up, arrows move.',
         down: e => this.brDown(e, id), click: () => this.brClick(id), key: e => this.brKey(e, id), focus: () => { if (this.state.brFocus !== sl) this.setState({ brFocus: sl }); } };
@@ -149,7 +176,9 @@ export default class Portfolio extends Component {
       brParts: fx ? fx.parts.map(p => ({ x: fx.x + 'px', y: fx.y + 'px', c: p.c, tf: fx.on ? 'translate(' + p.dx + 'px,' + p.dy + 'px) rotate(' + p.r + 'deg)' : 'none', op: fx.on ? 0 : 1 })) : [],
       brMsgShow: !!(fx && fx.msg), brMsg: fx ? { x: fx.mx + 'px', y: fx.my + 'px', tf: fx.mtf, text: fx.msg, op: fx.fade ? 0 : 1 } : { x: '0', y: '0', tf: 'none', text: '', op: 0 },
       // Corner note telling visitors the frame is a toy; it bows out once they have moved or recoloured a brick.
-      brHint: { left: (t + 14) + 'px', top: (t + 12) + 'px', op: changed || (dr && dr.moved) ? 0 : 1 },
+      brHint: { left: (t + 14) + 'px', top: (t + 12) + 'px', op: intro !== 'done' || changed || (dr && dr.moved) ? 0 : 1 },
+      // Hero content and header stay hidden until the loader has built the frame.
+      introOp: intro === 'done' ? 1 : 0,
       brChanged: changed, brResetL: (t + 14) + 'px', brResetB: (t + 14) + 'px', brLive: this.state.brLive || '',
       brReset: () => { this.setState({ brN: N, brOrder: st.defOrder, brColor: st.defColor, brPick: null, brLive: 'Frame reset.' }); } };
   }
@@ -268,6 +297,9 @@ export default class Portfolio extends Component {
       gmDone: () => { const cols2 = ['#8A6DFF', '#FFC414', '#13A882', '#FF5FA8', '#2F5BFF', '#FF6A10']; const parts = Array.from({ length: 16 }, (_, i) => { const a2 = (i / 16) * Math.PI * 2; const r = 80 + (i % 4) * 25; return { c: cols2[i % 6], s: i % 3, dx: Math.round(Math.cos(a2) * r * 1.5), dy: Math.round(Math.sin(a2) * r), r: (i * 53) % 360 }; });
         clearTimeout(this.gfT1); clearTimeout(this.gfT2); this.setState({ gmFinished: true, gmSel: null, gmFx: { parts, on: false } }); this.gfT1 = setTimeout(() => this.setState(s => s.gmFx ? { gmFx: { ...s.gmFx, on: true } } : null), 30); this.gfT2 = setTimeout(() => this.setState({ gmFx: null }), 1000); },
       gmFinished: !!st.gmFinished, gmKeep: () => this.setState({ gmFinished: false }),
+      // 3D view of the current build: raw grid bricks (shape, colour, cell position, stack level).
+      gm3dOpen: !!st.gm3dOpen, gm3dShow: () => this.setState({ gm3dOpen: true, gmSel: null }), gm3dClose: () => this.setState({ gm3dOpen: false }),
+      gm3d: { bricks: bricks.map(b => ({ sh: b.sh, c: b.c, x: b.x, y: b.y, z: b.z })), cols, rows, colors: COL },
       gmParts: fx ? fx.parts.map(p => ({ c: p.c, clip: shapes[p.s], tf: fx.on ? 'translate(' + p.dx + 'px,' + p.dy + 'px) rotate(' + p.r + 'deg)' : 'none', op: fx.on ? 0 : 1 })) : []
     };
   }

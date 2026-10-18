@@ -212,6 +212,9 @@ export default function Home({ v }) {
             alignContent: 'center',
             justifyContent: 'center',
             gap: v.introGap,
+            // Fades in once the loader has built the brick frame.
+            opacity: v.introOp,
+            transition: 'opacity 0.55s ease',
           }}
         >
           <div

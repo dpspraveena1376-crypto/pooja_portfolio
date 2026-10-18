@@ -1,3 +1,5 @@
+import Lego3D from './Lego3D.jsx';
+
 export default function Contact({ v }) {
   return (
     <section
@@ -142,6 +144,26 @@ export default function Contact({ v }) {
               <button
                 className="ix-8"
                 type="button"
+                onClick={v.gm3dOpen ? v.gm3dClose : v.gm3dShow}
+                aria-pressed={v.gm3dOpen}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: '999px',
+                  border: '1.5px solid #24212E',
+                  fontFamily: "'Fredoka', sans-serif",
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  color: '#24212E',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  background: '#BBA8FF',
+                }}
+              >
+                {v.gm3dOpen ? 'Back to building' : '3D view'}
+              </button>
+              <button
+                className="ix-8"
+                type="button"
                 onClick={v.gmUndo}
                 style={{
                   padding: '7px 14px',
@@ -254,7 +276,10 @@ export default function Contact({ v }) {
                 </button>
               </div>
             ) : null}
-            <div style={{ display: 'flex', flexDirection: v.gmDir, gap: '16px', alignItems: 'flex-start' }}>
+            {v.gm3dOpen ? (
+              <Lego3D bricks={v.gm3d.bricks} cols={v.gm3d.cols} rows={v.gm3d.rows} colors={v.gm3d.colors} onClose={v.gm3dClose} />
+            ) : null}
+            <div style={{ display: v.gm3dOpen ? 'none' : 'flex', flexDirection: v.gmDir, gap: '16px', alignItems: 'flex-start' }}>
               <div
                 ref={v.gmCanvasRef}
                 role="application"
