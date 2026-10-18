@@ -1,0 +1,40 @@
+/* Hand-written adaptations on top of the design's own JS-driven breakpoints.
+   !important is needed where the base value is an inline style. */
+
+/* Loose red bricks on the Experience / Projects seam. The design placed them with page-absolute
+   pixels for a 1440px canvas; here they are anchored to the section edge so they hold their spot
+   at every width instead of drifting (and forcing horizontal scroll below 1366px). */
+.seam-brick {
+  position: absolute;
+  z-index: 3;
+  width: clamp(104px, 10.5vw, 151px);
+  aspect-ratio: 151 / 109;
+  transform: rotate(14deg);
+  pointer-events: none;
+  filter: drop-shadow(0 6px 8px rgba(36, 33, 46, 0.25));
+}
+.seam-brick--a { right: clamp(40px, 7.9vw, 114px); bottom: -10px; }
+.seam-brick--b { right: clamp(8px, 4.9vw, 70px); bottom: 20px; }
+@media (max-width: 639px) {
+  .seam-brick { display: none; }
+}
+
+/* "Feeling playful?" button: the single row leaves no room for its text on phones,
+   so the label drops to its own line under the bricks and arrow. */
+@media (max-width: 560px) {
+  .playful { flex-wrap: wrap; gap: 10px 14px !important; padding: 14px 16px !important; }
+  .playful__go { margin-left: auto; }
+  .playful__text { order: 3; flex: 1 1 100% !important; }
+}
+
+/* Hero intro line: fixed one-line box in the design; let it grow once it has to wrap. */
+.hero-intro { height: 27px; }
+@media (max-width: 660px) {
+  .hero-intro { height: auto; min-height: 27px; }
+}
+
+/* LEGO studio: roomier tap targets on touch screens. */
+@media (pointer: coarse) {
+  .gm-chip { min-height: 38px; padding: 7px 14px !important; }
+  .gm-tray-btn { padding: 8px !important; }
+}

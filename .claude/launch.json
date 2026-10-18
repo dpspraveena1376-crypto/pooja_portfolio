@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "site", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    { "name": "production-preview", "runtimeExecutable": "npm", "runtimeArgs": ["run", "preview", "--", "--port", "4173", "--strictPort"], "port": 4173 },
+    { "name": "design-reference", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "5174", "--directory", "design-source"], "port": 5174 }
+  ]
+}

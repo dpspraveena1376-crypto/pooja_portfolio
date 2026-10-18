@@ -1,0 +1,74 @@
+/* Link chips on project cards that point to several live sites. */
+.proj-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 13px;
+  border-radius: 999px;
+  border: 1.5px solid #24212E;
+  background: #FFFFFF;
+  color: #24212E;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.proj-link:hover {
+  color: #24212E;
+  transform: translateY(-2px);
+  box-shadow: 2px 3px 0 #24212E;
+}
+.proj-link:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Handwritten note in the top-left corner of the hero frame, pointing at the bricks. */
+.brick-hint {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: calc(100% - 150px);
+  transform: rotate(-3deg);
+  transform-origin: 0 0;
+  transition: opacity 0.4s ease;
+  animation: brick-hint-in 0.6s ease 0.9s both;
+}
+.brick-hint svg { flex: none; }
+.brick-hint__text { display: flex; flex-direction: column; gap: 1px; margin-top: 14px; }
+.brick-hint__title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  color: #2F5BFF;
+  white-space: nowrap;
+}
+.brick-hint__sub {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: #4A4556;
+}
+@keyframes brick-hint-in {
+  from { opacity: 0; translate: 8px 8px; }
+}
+@media (max-width: 899px) {
+  .brick-hint svg { width: 30px; height: 26px; }
+  .brick-hint__text { margin-top: 10px; }
+  .brick-hint__title { font-size: 21px; }
+  .brick-hint__sub { font-size: 11.5px; }
+}
+@media (max-width: 360px) {
+  .brick-hint { gap: 3px; max-width: calc(100% - 156px); }
+  .brick-hint svg { width: 20px; height: 17px; }
+  .brick-hint__text { margin-top: 7px; }
+  .brick-hint__title { font-size: 17.5px; }
+  .brick-hint__sub { font-size: 10.5px; }
+}

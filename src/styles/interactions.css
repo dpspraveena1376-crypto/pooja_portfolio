@@ -1,0 +1,23 @@
+/* Hover / pressed states. !important because base styles are inline. */
+.ix-0:hover { transform: rotate(-3deg) !important; color: #24212E !important; }
+.ix-1:hover { transform: translateY(-1px) !important; border-color: rgba(36,33,46,0.4) !important; box-shadow: 0 6px 18px rgba(36,33,46,0.12) !important; }
+.ix-3:hover { background: #FFF6D9 !important; color: #24212E !important; }
+.ix-4:hover { transform: var(--ix-4-0) !important; filter: drop-shadow(0 8px 10px rgba(36,33,46,0.26)) brightness(1.06) !important; }
+.ix-5:hover { background: #FFFFFF !important; border-color: #24212E !important; }
+.ix-7:hover { transform: rotate(0deg) translateY(-6px) !important; }
+.ix-8:hover { background: #FFF3C4 !important; }
+.ix-9:hover { transform: translateY(-2px) !important; }
+.ix-b:hover { transform: translateY(-8px) rotate(0deg) !important; }
+.ix-c:hover { color: #1C3FCC !important; transform: translateY(3px) !important; }
+.ix-d:hover { transform: rotate(0deg) scale(1.02) !important; }
+.ix-e:hover { transform: translate(-2px,-2px) !important; box-shadow: 6px 6px 0 #24212E !important; color: #FFFFFF !important; }
+.ix-g:hover { background: rgba(255,255,255,0.7) !important; transform: translateY(-2px) !important; }
+.ix-h:hover { transform: translate(-2px,-2px) !important; box-shadow: 6px 6px 0 #24212E !important; }
+.ix-j:hover { color: #24212E !important; }
+.ix-k:hover { background: var(--ix-k-0) !important; color: #24212E !important; }
+
+.ix-2:active { transform: translateY(1px) !important; box-shadow: 0 2px 6px rgba(36,33,46,0.1) !important; }
+.ix-6:active { transform: translateY(2px) !important; }
+.ix-a:active { transform: translateY(1px) !important; }
+.ix-f:active { transform: translate(3px,3px) !important; box-shadow: 1px 1px 0 #24212E !important; }
+.ix-i:active { transform: translate(2px,2px) !important; box-shadow: 1px 1px 0 #24212E !important; }

@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+# Raw Claude Design export (reference only; contains original uploads)
+design-source/
+# Source files dropped in the project root (the site serves the copies in public/assets)
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+/*.pdf
