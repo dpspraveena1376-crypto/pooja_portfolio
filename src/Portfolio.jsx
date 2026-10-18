@@ -49,6 +49,17 @@ export default class Portfolio extends Component {
   // another before the hero fades in. Plays once per full page load; skipped for reduced motion. The
   // safety timer reveals the page even if images are slow or fail.
   startIntro() {
+    // A full page load always opens on the home frame: the browser would otherwise restore the old
+    // scroll position, leaving the frame half off-screen and the loader playing out of view. Links to a
+    // section (#resume etc.) still jump straight there.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    if (!window.location.hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    else {
+      // The sections are rendered by React after the browser looks for the anchor, so jump to it once
+      // the page has rendered and the hero has settled its size.
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      this.hashT = setTimeout(() => { const el = document.getElementById(id); el && el.scrollIntoView({ behavior: 'instant', block: 'start' }); }, 500);
+    }
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) { this.setState({ intro: 'done' }); return; }
     // Bricks set off at random moments within INTRO_SPREAD ms, each gliding for INTRO_MOVE ms.
@@ -58,7 +69,7 @@ export default class Portfolio extends Component {
     this.introT3 = setTimeout(() => { if (this.state.intro !== 'done') this.setState({ intro: 'done' }); }, 4500);
   }
   componentWillUnmount() {
-    clearTimeout(this.introT1); clearTimeout(this.introT2); clearTimeout(this.introT3);
+    clearTimeout(this.introT1); clearTimeout(this.introT2); clearTimeout(this.introT3); clearTimeout(this.hashT);
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('load', this.onScroll);
